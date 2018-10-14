@@ -18,10 +18,6 @@ class ListEntry {
         this.count = count;
     }
 
-    static fromStoreEntry(storeEntry: StoreEntry) {
-        return new ListEntry(storeEntry.tag, storeEntry.date, 1);
-    }
-
     merge(entry: ListEntry) {
         if (entry) {
             this.count = entry.count + 1;
@@ -40,6 +36,10 @@ class ListEntry {
         } else {
             return 0;
         }
+    }
+
+    static fromStoreEntry(storeEntry: StoreEntry) {
+        return new ListEntry(storeEntry.tag, storeEntry.date, 1);
     }
 
     static compare(entry1: ListEntry, entry2: ListEntry) {

@@ -21,7 +21,7 @@ export class StoreEntry {
         this.message = message;
     }
 
-    static buildFromLine(csvConfig: any) {
+    static fromCsvLine(csvConfig: any) {
         return (line: string) => {
             const csvEntries: string[][] = parse(line, csvConfig);
             const csvEntry = csvEntries[0];
@@ -72,6 +72,6 @@ export class Store {
         return fs
             .createReadStream(this.path, "utf8")
             .pipe(split())
-            .pipe(map(StoreEntry.buildFromLine(this.csvConfig)));
+            .pipe(map(StoreEntry.fromCsvLine(this.csvConfig)));
     }
 }

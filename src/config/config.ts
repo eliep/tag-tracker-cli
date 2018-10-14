@@ -11,6 +11,7 @@ export interface CliListOption {
 export interface CliLogOption {
     size?: number;
     future?: boolean;
+    compact?: boolean;
 }
 
 export interface CliAddOption {
@@ -30,6 +31,7 @@ export interface ListOption extends HistorySettings {
 }
 
 export interface LogOption extends HistorySettings {
+    compact: boolean;
 }
 
 export interface AddOption {
@@ -63,7 +65,8 @@ export class Config {
         const defaultOption = this.getDefaultCommandOptions().log;
         const size = cliOption.size || defaultOption.size;
         const future = (cliOption.future  === undefined) ? defaultOption.future : cliOption.future;
-        return { size, future };
+        const compact = (cliOption.compact === undefined) ? defaultOption.compact : cliOption.compact;
+        return { size, future, compact };
     }
 
     buildAddOption(cliOption: CliAddOption): AddOption {

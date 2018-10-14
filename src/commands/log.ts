@@ -1,5 +1,6 @@
 const clc = require("cli-color");
 
+import { Moment } from "moment";
 import { Config, CliLogOption } from "../config/config";
 import { DateRange } from "./date";
 import { Store, StoreEntry } from "../store/store";
@@ -8,11 +9,11 @@ import { renderTable } from "../cli/render"
 
 class DateEntry {
     day: string;
-    entries: StoreEntry[];
+    logEntries: LogEntry[];
 
-    constructor(day: string, entries: StoreEntry[]) {
+    constructor(day: string, entries: LogEntry[]) {
         this.day = day;
-        this.entries = entries;
+        this.logEntries = entries;
     }
 
     compareTo(entry: DateEntry) {
@@ -25,8 +26,70 @@ class DateEntry {
         }
     }
 
+    compact() {
+        let groupedByTag = new Map<string, LogEntry>();
+        for (let logEntry of this.logEntries) {
+            let newLogEntry = logEntry.merge(groupedByTag.get(logEntry.tag));
+            groupedByTag.set(logEntry.tag, newLogEntry);
+        }
+        this.logEntries = Array.from(groupedByTag.values());
+
+        return this;
+    }
+
     static compare(entry1: DateEntry, entry2: DateEntry) {
         return entry1.compareTo(entry2);
+    }
+}
+
+class LogEntry {
+    date: Moment;
+    tag: string;
+    duration: number;
+    categories: Map<string, Set<string>>;
+    message: string;
+
+    constructor(date: Moment, tag: string, duration: number, categories: Map<string, string>, message: string) {
+        this.date = date;
+        this.tag = tag;
+        this.duration = duration;
+        this.categories = new Map<string, Set<string>>()
+        categories.forEach((value, key) => {
+            this.categories.set(key, new Set([value]));
+        });
+        this.message = message;
+    }
+
+    merge(otherEntry: LogEntry): LogEntry {
+        if (!otherEntry) {
+            return this;
+        }
+
+        this.duration += otherEntry.duration;
+        otherEntry.categories.forEach((value, key) => {
+            let newValue = (this.categories.has(key))
+                ? new Set([...this.categories.get(key), ...value])
+                : value;
+            this.categories.set(key, newValue);
+        });
+
+        return this;
+    }
+
+    printableCategories() {
+        let printableCategories: string[] = [];
+        this.categories.forEach((value, key) => {
+            printableCategories.push(`${clc.underline(key)}:${Array.from(value).join("/")}`);
+        });
+        return printableCategories;
+    }
+
+    static fromStoreEntry(storeEntry: StoreEntry) {
+        return new LogEntry(storeEntry.date,
+            storeEntry.tag,
+            storeEntry.duration,
+            storeEntry.categories,
+            storeEntry.message);
     }
 }
 
@@ -35,23 +98,23 @@ export function log(config: Config, store: Store) {
         const options = config.buildLogOption(cliOption);
         const dateRange = DateRange.build(options.size, options.future);
 
-        const entries = new Map<string, DateEntry>();
+        const dateEntries = new Map<string, DateEntry>();
         store
             .read()
-            .pipe(filter( (entry: StoreEntry) => dateRange.contains(entry.date)))
-            .pipe(forEach((entry: StoreEntry) => {
-                const day = entry.date.format("YYYY/MM/DD");
-                if (!entries.has(day)) {
-                    entries.set(day, new DateEntry(day, []));
+            .pipe(filter( (storeEntry: StoreEntry) => dateRange.contains(storeEntry.date)))
+            .pipe(forEach((storeEntry: StoreEntry) => {
+                const day = storeEntry.date.format("YYYYMMDD");
+                if (!dateEntries.has(day)) {
+                    dateEntries.set(day, new DateEntry(day, []));
                 }
-                entries.get(day).entries.push(entry);
+                dateEntries.get(day).logEntries.push(LogEntry.fromStoreEntry(storeEntry));
             }))
             .on("finish",async () => {
                 const sortedDateEntries = Array
-                    .from(entries.values())
+                    .from(dateEntries.values())
                     .sort(DateEntry.compare);
 
-                const results = format(sortedDateEntries);
+                const results = format(sortedDateEntries, options.compact);
 
                 renderTable(results, {
                     pager: true,
@@ -67,39 +130,35 @@ export function log(config: Config, store: Store) {
     }
 }
 
-function format(dateEntries: DateEntry[]) {
+function format(dateEntries: DateEntry[], compact: boolean) {
     return dateEntries
         .map(dateEntry => {
-            return dateEntry.entries
-                .map(entry => entryLines(dateEntry, entry))
+            if (compact) {
+                dateEntry.compact();
+            }
+
+            return dateEntry.logEntries
+                .map(logEntry => entryLines(logEntry, compact))
                 .reduce((flat, next) => flat.concat(next), []);
         })
         .reduce((flat, next) => flat.concat(next), []);
 }
 
-function entryLines(dateEntry: DateEntry, entry: StoreEntry): string[][] {
+function entryLines(logEntry: LogEntry, compact: boolean): string[][] {
     let entryLines = [
-        [`${clc.cyan(dateEntry.day)}`,
-            clc.bold(clc.green(entry.duration.toString())),
-            clc.bold(clc.yellow(entry.tag))],
+        [`${clc.cyan(logEntry.date.format("YYYY/MM/DD"))}`,
+            clc.bold(clc.green(logEntry.duration.toString())),
+            clc.bold(clc.yellow(logEntry.tag))],
     ];
 
-    if (entry.message !== "") {
-        entryLines.push(["", "", `message:${entry.message}`]);
+    if (!compact && logEntry.message !== "") {
+        entryLines.push(["", "", `${clc.underline("message")}:${logEntry.message}`]);
     }
 
-    if (entry.categories !== undefined && entry.categories.size > 0) {
-        const printableCategories = categoriesToString(entry.categories);
+    if (logEntry.categories !== undefined && logEntry.categories.size > 0) {
+        const printableCategories = logEntry.printableCategories();
         entryLines.push(["", "", `${printableCategories.join(" ")}`]);
     }
 
     return entryLines;
-}
-
-function categoriesToString(categories: Map<string, string>) {
-    let printableCategories: string[] = [];
-    categories.forEach((value, key) => {
-        printableCategories.push(`${key}:${value}`);
-    });
-    return printableCategories;
 }

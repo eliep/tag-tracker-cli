@@ -23,7 +23,6 @@ program
     .option("-a, --after <days>", "Shift that tag time d days after now", parseInt)
     .option("-b, --before <days>", "Shift that tag time d days before now", parseInt)
     .option("-m, --message <message>", "Tag associated message")
-    // .option("-c, --category <category>", "Add a category to that tagas an option")
     .action(add(config, store));
 
 program
@@ -39,6 +38,7 @@ program
     .description("Show a log of added tags")
     .option("-s, --size <days>", "History size in days", parseInt)
     .option("-f, --future", "Print tag in the future")
+    .option("-c, --compact", "Print the tags only")
     .action(log(config, store));
 
 program
