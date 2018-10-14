@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "outDir": "build/",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es5",
+    "lib": [ "es2017" ],
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": false,
+    "downlevelIteration": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "custom_typings",
+    "test/**/*.spec.ts"
+  ]
+}
