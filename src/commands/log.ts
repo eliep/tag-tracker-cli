@@ -89,14 +89,14 @@ function entryLines(dateEntry: DateEntry, entry: StoreEntry): string[][] {
     }
 
     if (entry.categories !== undefined && entry.categories.size > 0) {
-        const printableCategories = categoriesToSting(entry.categories);
+        const printableCategories = categoriesToString(entry.categories);
         entryLines.push(["", "", `${printableCategories.join(" ")}`]);
     }
 
     return entryLines;
 }
 
-function categoriesToSting(categories: Map<string, string>) {
+function categoriesToString(categories: Map<string, string>) {
     let printableCategories: string[] = [];
     categories.forEach((value, key) => {
         printableCategories.push(`${key}:${value}`);
