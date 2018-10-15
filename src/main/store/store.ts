@@ -42,22 +42,31 @@ export class StoreEntry {
         }
 
         return categories.reduce( (parsedCategories, category) => {
+            if (StoreEntry.isValidCategory(category)) {
+                return parsedCategories;
+            }
             return parsedCategories.set(category.split(":")[0], category.split(":")[1]);
         }, new Map<string, string>());
+    }
+
+    private static isValidCategory(category: string) {
+        return category.indexOf(":") < 0 ||
+            category.split(":")[0].length === 0 ||
+            category.split(":")[1].length === 0;
     }
 
 }
 
 export class Store {
+    static readonly csvConfig = { delimiter: ",", escape: "\\", quoted: true };
     readonly path: string;
-    readonly csvConfig = { delimiter: ",", escape: "\\", quoted: true };
 
     constructor(folder: string, filename: string = ".tags") {
         this.path = `${folder}/${filename}`;
     }
 
     write(days: number, data: any[]) {
-        const stringifier = stringify(this.csvConfig);
+        const stringifier = stringify(Store.csvConfig);
         const path = this.path;
         const datedData = data.slice();
         datedData.unshift(moment().add(days, "days").toISOString());
@@ -72,6 +81,6 @@ export class Store {
         return fs
             .createReadStream(this.path, "utf8")
             .pipe(split())
-            .pipe(map(StoreEntry.fromCsvLine(this.csvConfig)));
+            .pipe(map(StoreEntry.fromCsvLine(Store.csvConfig)));
     }
 }

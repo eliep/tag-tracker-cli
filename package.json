@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc && sed -i 's/@VERSION@/0.3.2/' build/tag.js",
     "test": "jest",
+    "testCoverage": "jest --coverage",
     "run": "tag --help"
   },
   "bin": {
