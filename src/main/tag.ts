@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-const pkg = require("../package.json");
 const homedir = require('os').homedir();
 
 import { Command } from "commander";
@@ -13,8 +12,10 @@ const program = new Command("tag");
 const config = new Config();
 const store = new Store(homedir, config.getStoreFilename());
 
+const VERSION = "@VERSION@";
+
 program
-    .version(pkg.version);
+    .version(VERSION);
 
 program
     .command("add <tag> [categories...]")

@@ -2,7 +2,6 @@ const deepmerge = require('deepmerge');
 
 import Configstore = require("configstore");
 import defaultConfig = require("./defaultConfig");
-const pkg = require("../../package.json");
 
 export interface CliListOption {
     size?: number;
@@ -48,8 +47,10 @@ interface CommandOptions {
     log: LogOption;
 }
 
+const NAME = "tag-tracker-cli";
+
 export class Config {
-    readonly store = new Configstore(pkg.name, defaultConfig);
+    readonly store = new Configstore(NAME, defaultConfig);
 
     getStoreFilename(): string {
         return this.store.get("store.filename");
