@@ -1,11 +1,11 @@
 {
   "name": "tag-tracker-cli",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Tag your days",
   "main": "tag.js",
   "scripts": {
-    "build": "tsc",
-    "test": "echo \"Will do, await promise\" && exit 1",
+    "build": "tsc && sed -i 's/@VERSION@/0.3.2/' build/tag.js",
+    "test": "jest",
     "run": "tag --help"
   },
   "bin": {
@@ -30,7 +30,10 @@
   "devDependencies": {
     "@types/commander": "^2.12.2",
     "@types/configstore": "^2.1.1",
+    "@types/jest": "^23.3.5",
     "@types/node": "^10.11.7",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.4",
     "tslint": "^5.11.0",
     "typescript": "^3.1.3"
   }

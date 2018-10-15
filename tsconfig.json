@@ -12,11 +12,11 @@
     "downlevelIteration": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/main/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "custom_typings",
-    "test/**/*.spec.ts"
+    "src/test/**/*.spec.ts"
   ]
 }
