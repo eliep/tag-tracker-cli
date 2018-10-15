@@ -1,3 +1,5 @@
+const deepmerge = require('deepmerge');
+
 import Configstore = require("configstore");
 import defaultConfig = require("./defaultConfig");
 const pkg = require("../../package.json");
@@ -74,11 +76,10 @@ export class Config {
         const duration = cliOption.duration || defaultOption.duration;
         const days = -cliOption.before || cliOption.after || defaultOption.days;
         const message = cliOption.message || defaultOption.message;
-
         return { duration, days, message };
     }
 
     private getDefaultCommandOptions(): CommandOptions {
-        return this.store.get("default");
+        return deepmerge( defaultConfig.default, this.store.get("default"));
     }
 }
