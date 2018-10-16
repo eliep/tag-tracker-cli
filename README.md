@@ -1,4 +1,6 @@
 # Tag Tracker
+[![Build Status](https://travis-ci.org/eliep/tag-tracker-cli.svg?branch=master)](https://travis-ci.org/eliep/tag-tracker-cli)
+
 WIP
 
 ## Installation
