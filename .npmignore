@@ -1,0 +1,7 @@
+.idea/
+node_modules/
+coverage/
+src/
+jest.config.js
+tsconfig.json
+tslint.json
