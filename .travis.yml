@@ -5,4 +5,16 @@ node_js:
 script:
   - npm run build
   - npm test
-
+  - npm run docs:build
+cache:
+  directories:
+    - "node_modules"
+deploy:
+  provider: pages
+  skip-cleanup: true
+  local_dir: docs/.vuepress/dist
+  github-token: $GITHUB_TOKEN
+  repo: eliep/tag-tracker-cli
+  target-branch: gh-pages
+  on:
+    branch: master
