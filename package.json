@@ -1,6 +1,6 @@
 {
   "name": "tag-tracker-cli",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Tag your days",
   "main": "build/tag.js",
   "scripts": {
