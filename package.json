@@ -1,6 +1,6 @@
 {
   "name": "tag-tracker-cli",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Tag your days",
   "main": "build/tag.js",
   "scripts": {
@@ -25,6 +25,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eliep/tag-tracker-cli.git"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "cli-color": "^1.3.0",
