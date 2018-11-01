@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const homedir = require('os').homedir();
+const figlet = require('figlet')
 
 import { Command } from "commander";
 import { add } from "./commands/add";
@@ -13,6 +14,7 @@ const config = new Config();
 const store = new Store(homedir, config.getStoreFilename());
 
 const VERSION = "@VERSION@";
+
 
 program
     .version(VERSION);
@@ -44,3 +46,12 @@ program
 
 program
     .parse(process.argv);
+
+if (program.args.join('') === '') {
+    const logo = figlet.textSync('$ tag _', {
+        font: 'Standard',
+        horizontalLayout: 'default',
+        verticalLayout: 'default'
+    });
+    process.stdout.write(`\n${logo}\n\n`);
+}
