@@ -1,4 +1,5 @@
 module.exports = {
+    title: 'tag-tracker-cli',
     base: '/tag-tracker-cli/',
     themeConfig: {
         repo: 'eliep/tag-tracker-cli',
